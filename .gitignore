@@ -11,3 +11,6 @@ models/*.pt
 
 # environment
 .env
+
+mlruns/
+*.pt
