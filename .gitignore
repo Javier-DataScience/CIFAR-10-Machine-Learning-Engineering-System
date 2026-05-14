@@ -1,6 +1,13 @@
-venv/
+# data
+data/
+notebooks/data/
+
+# python cache
 __pycache__/
 *.pyc
-mlruns/
+
+# models (optional decision)
 models/*.pt
-notebooks/data/
+
+# environment
+.env
