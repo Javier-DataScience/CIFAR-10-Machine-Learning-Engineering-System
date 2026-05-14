@@ -140,4 +140,4 @@ def train_model(model_name, epochs=5):
 if __name__ == "__main__":
 
     # CHANGE ONLY THIS LINE WHEN SWITCHING MODELS
-    train_model("cnn_v2", epochs=5)
+    train_model("cnn_v5", epochs=5)
