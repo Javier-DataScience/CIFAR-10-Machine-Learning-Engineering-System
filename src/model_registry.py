@@ -1,28 +1,30 @@
-# This module defines the MODEL REGISTRY.
-# It ensures strict mapping between model names and architectures.
-# This prevents architecture confusion during training and inference.
+"""
+========================================
+MODEL REGISTRY (FINAL STABLE VERSION)
+========================================
 
-from src.models import CNN_V1
+This module is the SINGLE SOURCE OF TRUTH
+for selecting model architectures.
 
+Rules:
+- Every model MUST be explicitly registered
+- Names MUST match training calls exactly
+"""
 
-# -------------------------
-# MODEL REGISTRY
-# -------------------------
-MODEL_MAP = {
-    "cnn_v1": CNN_V1
-    # Future models will be added here:
-    # "cnn_v2": CNN_V2,
-    # "cnn_v3": CNN_V3,
-    # "cnn_v4": CNN_V4,
-    # "cnn_v5": CNN_V5,
-}
+from src.models import CNN_V1, CNN_V2
 
 
 def get_model(model_name):
-    """
-    Returns model class based on registry key.
-    """
-    if model_name not in MODEL_MAP:
-        raise ValueError(f"Model {model_name} not found in registry")
 
-    return MODEL_MAP[model_name]()
+    MODEL_MAP = {
+        "cnn_v1": CNN_V1(),
+        "cnn_v2": CNN_V2(),
+    }
+
+    if model_name not in MODEL_MAP:
+        raise ValueError(
+            f"Model '{model_name}' not found in registry. "
+            f"Available models: {list(MODEL_MAP.keys())}"
+        )
+
+    return MODEL_MAP[model_name]

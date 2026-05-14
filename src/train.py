@@ -1,115 +1,143 @@
-# This script trains CNN_V1 on CIFAR-10 and saves a frozen model artifact.
-# It follows strict ML system rules:
-# - no MLflow dependency
-# - no notebook logic
-# - frozen model is saved only once (no overwrite)
-# - clean epoch logging: loss, train accuracy, test accuracy in one line
+"""
+========================================
+TRAINING MODULE (CIFAR-10 PROJECT)
+========================================
 
+This module is responsible for:
+
+1. Loading CIFAR-10 dataset (train/test)
+2. Selecting model architecture from registry (CNN_V1, CNN_V2, etc.)
+3. Training the model for a given number of epochs
+4. Evaluating performance (train + test accuracy)
+5. Logging metrics and parameters to MLflow
+6. Saving a FROZEN model (.pt file)
+
+IMPORTANT RULES:
+- Each model is saved ONLY ONCE (no overwrite allowed)
+- MLflow experiment name must remain constant
+- Saved models are frozen for inference only
+"""
+
+import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import os
+import mlflow
 
-from src.models import CNN_V1
 from src.data_loader import get_cifar10_dataloaders
+from src.model_registry import get_model
 
 
-def train_cnn_v1(epochs=5, lr=0.001):
+def train_model(model_name, epochs=5):
 
-    # -------------------------
-    # DEVICE SETUP
-    # -------------------------
+    print(f"\n🚀 TRAINING STARTED: {model_name}\n")
+
+    # -----------------------------
+    # MLflow CONFIGURATION
+    # -----------------------------
+    mlflow.set_tracking_uri("file:./mlruns")
+    mlflow.set_experiment("cifar10_cnn_experiment")
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # -------------------------
-    # MODEL
-    # -------------------------
-    model = CNN_V1().to(device)
+    train_loader, test_loader = get_cifar10_dataloaders()
+    model = get_model(model_name).to(device)
 
-    # -------------------------
-    # DATA
-    # -------------------------
-    trainloader, testloader = get_cifar10_dataloaders(batch_size=64)
-
-    # -------------------------
-    # LOSS + OPTIMIZER
-    # -------------------------
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=lr)
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-    # -------------------------
-    # TRAINING LOOP
-    # -------------------------
-    for epoch in range(epochs):
+    with mlflow.start_run(run_name=model_name):
 
-        model.train()
+        mlflow.log_param("model_name", model_name)
+        mlflow.log_param("epochs", epochs)
 
-        running_loss = 0.0
-        correct_train = 0
-        total_train = 0
+        # -----------------------------
+        # TRAINING LOOP
+        # -----------------------------
+        for epoch in range(epochs):
 
-        for images, labels in trainloader:
-            images, labels = images.to(device), labels.to(device)
+            model.train()
 
-            optimizer.zero_grad()
+            running_loss = 0.0
+            correct = 0
+            total = 0
 
-            outputs = model(images)
-            loss = criterion(outputs, labels)
-
-            loss.backward()
-            optimizer.step()
-
-            running_loss += loss.item()
-
-            _, predicted = torch.max(outputs, 1)
-            total_train += labels.size(0)
-            correct_train += (predicted == labels).sum().item()
-
-        train_acc = correct_train / total_train
-
-        # -------------------------
-        # TEST EVALUATION
-        # -------------------------
-        model.eval()
-
-        correct_test = 0
-        total_test = 0
-
-        with torch.no_grad():
-            for images, labels in testloader:
+            for images, labels in train_loader:
                 images, labels = images.to(device), labels.to(device)
 
+                optimizer.zero_grad()
                 outputs = model(images)
+                loss = criterion(outputs, labels)
+                loss.backward()
+                optimizer.step()
+
+                running_loss += loss.item()
+
                 _, predicted = torch.max(outputs, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
 
-                total_test += labels.size(0)
-                correct_test += (predicted == labels).sum().item()
+            train_acc = correct / total
+            avg_loss = running_loss / len(train_loader)
 
-        test_acc = correct_test / total_test
+            # -----------------------------
+            # TEST EVALUATION
+            # -----------------------------
+            model.eval()
+            correct = 0
+            total = 0
 
-        # -------------------------
-        # CLEAN ONE-LINE LOG
-        # -------------------------
-        print(
-            f"Epoch {epoch+1}/{epochs} | "
-            f"Loss: {running_loss/len(trainloader):.4f} | "
-            f"Train Acc: {train_acc:.4f} | "
-            f"Test Acc: {test_acc:.4f}"
-        )
+            with torch.no_grad():
+                for images, labels in test_loader:
+                    images, labels = images.to(device), labels.to(device)
+                    outputs = model(images)
 
-    # -------------------------
-    # SAVE FROZEN MODEL (NO OVERWRITE)
-    # -------------------------
+                    _, predicted = torch.max(outputs, 1)
+                    total += labels.size(0)
+                    correct += (predicted == labels).sum().item()
+
+            test_acc = correct / total
+
+            # MLflow logging
+            mlflow.log_metric("loss", avg_loss, step=epoch)
+            mlflow.log_metric("train_accuracy", train_acc, step=epoch)
+            mlflow.log_metric("test_accuracy", test_acc, step=epoch)
+
+            print(
+                f"Epoch {epoch+1}/{epochs} | "
+                f"Loss: {avg_loss:.4f} | "
+                f"Train Acc: {train_acc:.4f} | "
+                f"Test Acc: {test_acc:.4f}"
+            )
+
+    # -----------------------------
+    # MODEL FREEZING + SAFE SAVE
+    # -----------------------------
     os.makedirs("models", exist_ok=True)
 
-    model_path = "models/cnn_v1.pt"
+    save_path = f"models/{model_name}.pt"
 
-    if not os.path.exists(model_path):
-        torch.save(model.state_dict(), model_path)
-        print(f"\nSaved frozen model -> {model_path}")
-    else:
-        print(f"\nModel already exists (FROZEN): {model_path} - skipping overwrite")
+    # Prevent accidental overwrite
+    if os.path.exists(save_path):
+        raise RuntimeError(
+            f"\n❌ MODEL ALREADY EXISTS: {save_path}\n"
+            "Delete it manually if retraining is intended.\n"
+        )
+
+    # Freeze model (inference mode)
+    model.eval()
+    for param in model.parameters():
+        param.requires_grad = False
+
+    torch.save(model.state_dict(), save_path)
+
+    print(f"\n✅ MODEL FROZEN AND SAVED: {save_path}\n")
 
 
+# -----------------------------
+# TERMINAL ENTRY POINT
+# -----------------------------
 if __name__ == "__main__":
-    train_cnn_v1()
+
+    # CHANGE ONLY THIS LINE WHEN SWITCHING MODELS
+    train_model("cnn_v2", epochs=5)
