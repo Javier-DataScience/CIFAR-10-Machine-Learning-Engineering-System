@@ -11,7 +11,13 @@
 
 ## 🚀 Project Overview (PORTFOLIO STORYTELLING)
 
-This project implements a complete Machine Learning Engineering system for CIFAR-10 image classification.
+This project implements a complete Machine Learning Engineering system for CIFAR-10 image classification, designed with a strong focus on modularity, reproducibility, and production readiness.
+
+Instead of focusing solely on model training, the system was engineered as an end-to-end pipeline that separates concerns across training, model versioning, inference, and deployment.
+
+The architecture enables multiple CNN experiments (CNN_V1 → CNN_V6), tracks performance using MLflow, and promotes the best-performing model into a production-ready artifact. This model is then served through a FastAPI backend and an interactive Streamlit interface, fully containerized using Docker.
+
+The project simulates a real-world ML production environment where models are not just trained, but deployed as scalable services.
 
 Instead of focusing only on model training, the system is designed as an end-to-end ML pipeline including:
 
@@ -75,24 +81,33 @@ Cifar_10_Computer_Vision_Project_System/
 ├── requirements.txt
 └── README.md
 ```
+## 🎯 Key Engineering Contributions
+
+- Designed a modular ML system separating training, inference, and deployment
+- Implemented model versioning through a custom model registry
+- Built a production-grade inference pipeline reusable across API and UI layers
+- Integrated MLflow for experiment tracking and model selection
+- Developed REST API using FastAPI for real-time inference
+- Created interactive UI using Streamlit
+- Containerized the full system using Docker
 
 ## 🔬 What This Project Demonstrates
-End-to-end ML system design
-Separation of training and inference logic
-Model versioning strategy
-Production-ready API deployment
-UI integration with Streamlit
-Docker-based containerization
-MLflow experiment tracking
+- End-to-end ML system design
+- Separation of training and inference logic
+- Model versioning strategy
+- Production-ready API deployment
+- UI integration with Streamlit
+- Docker-based containerization
+- MLflow experiment tracking
 
 
 ## 🧠 Model Development
 
 Multiple CNN architectures were developed and evaluated:
 
-CNN_V1 → baseline model
-CNN_V2–V5 → incremental improvements
-CNN_V6 → best-performing production model
+- CNN_V1 → baseline model
+- CNN_V2–V5 → incremental improvements
+- CNN_V6 → best-performing production model
 
 All experiments were tracked using MLflow.
 
@@ -113,15 +128,14 @@ All experiments were tracked using MLflow.
 - Returns predicted class
 
 ## 🎨 Streamlit UI
-streamlit run app/streamlit_app.py
-
-Interactive interface for real-time predictions.
+- streamlit run app/streamlit_app.py
+- Interactive interface for real-time predictions.
 
 ## 🐳 Docker Deployment
-docker build -t cifar10-api .
-docker run -p 8000:8000 cifar10-api
-docker build -f Dockerfile.streamlit -t cifar10-streamlit .
-docker run -p 8501:8501 cifar10-streamlit
+- docker build -t cifar10-api .
+- docker run -p 8000:8000 cifar10-api
+- docker build -f Dockerfile.streamlit -t cifar10-streamlit .
+- docker run -p 8501:8501 cifar10-streamlit
 
 ## 📊 Key Features
 - Modular ML architecture
