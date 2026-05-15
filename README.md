@@ -164,5 +164,14 @@ All experiments were tracked using MLflow.
 
 ## 👨‍💻 Author
 
+**AI/ML Engineering Learning Project by Alvaro Vega**
+
 Machine Learning Engineering Project
 Built for portfolio and production-style demonstration
+
+🎯 **Project Purpose:** Built as a hands-on end-to-end Machine Learning Engineering system to demonstrate model training, versioning, and production deployment using FastAPI, Streamlit, MLflow, and Docker.
+
+Aspiring AI Engineer | Machine Learning Engineer | NLP & LLM Systems
+
+🔗 GitHub: https://github.com/Javier-DataScience
+
