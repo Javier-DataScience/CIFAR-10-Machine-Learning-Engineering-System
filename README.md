@@ -184,14 +184,14 @@ cd CIFAR-10-Machine-Learning-Engineering-System
 ### 4️⃣ Run FastAPI service
 
 - uvicorn app.fastapi_app:app --reload
-
 - Open in browser:
-
-http://127.0.0.1:8000/docs
+- http://127.0.0.1:8000/docs
 
 ### 5️⃣ Run Streamlit app
 
 - streamlit run app/streamlit_app.py
+- Then open in your browser:
+- http://localhost:8501
 
 ### 6️⃣ Run with Docker (optional)
 
