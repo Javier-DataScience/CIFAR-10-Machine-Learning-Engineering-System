@@ -1,0 +1,20 @@
+
+========================================
+BEST MODEL METADATA
+========================================
+
+Model Name: cnn_v6
+
+Source Artifact:
+models/cnn_v6.pt
+
+Production Artifact:
+models/best_model.pt
+
+Test Accuracy:
+0.7733
+
+Purpose:
+Production inference serving
+
+========================================
