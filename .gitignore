@@ -15,3 +15,7 @@ models/*.pt
 mlruns/
 
 .vscode/
+# datasets
+notebooks/data/
+*.tar.gz
+*.zip
