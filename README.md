@@ -162,6 +162,46 @@ All experiments were tracked using MLflow.
 - Cloud deployment (AWS / Azure)
 - Model monitoring system
 
+## ⚙️ How to Run the Project
+
+### 1️⃣ Clone the repository
+
+```
+git clone https://github.com/Javier-DataScience/CIFAR-10-Machine-Learning-Engineering-System.git
+cd CIFAR-10-Machine-Learning-Engineering-System
+```
+
+### 2️⃣ Create virtual environment (optional but recommended)
+
+- python -m venv venv
+- source venv/bin/activate   # Mac/Linux
+- venv\Scripts\activate      # Windows
+
+### 3️⃣ Install dependencies
+
+- pip install -r requirements.txt
+
+### 4️⃣ Run FastAPI service
+
+- uvicorn app.fastapi_app:app --reload
+
+- Open in browser:
+
+http://127.0.0.1:8000/docs
+
+### 5️⃣ Run Streamlit app
+
+- streamlit run app/streamlit_app.py
+
+### 6️⃣ Run with Docker (optional)
+
+- FastAPI
+- docker build -t cifar10-api .
+- docker run -p 8000:8000 cifar10-api
+- Streamlit
+- docker build -f Dockerfile.streamlit -t cifar10-streamlit .
+- docker run -p 8501:8501 cifar10-streamlit
+
 ## 👨‍💻 Author
 
 **AI/ML Engineering Learning Project by Alvaro Vega**
