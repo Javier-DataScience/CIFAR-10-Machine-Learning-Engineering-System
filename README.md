@@ -9,6 +9,12 @@
 
 ---
 
+<p align="center">
+  <img src="assets/cifar10_interface.png" width="800"/>
+</p>
+
+---
+
 ## 🚀 Project Overview (PORTFOLIO STORYTELLING)
 
 This project implements a complete Machine Learning Engineering system for CIFAR-10 image classification, designed with a strong focus on modularity, reproducibility, and production readiness.
