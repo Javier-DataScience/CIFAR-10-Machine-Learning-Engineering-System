@@ -10,7 +10,7 @@
 ---
 
 <p align="center">
-  <img src="assets/cifar10_interface.png" width="800"/>
+  <img src="assets/cifar10_interface1.png" width="800"/>
 </p>
 
 ---
